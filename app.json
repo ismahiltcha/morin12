@@ -2,7 +2,7 @@
   "expo": {
     "name": "MeditrackMobileApp",
     "slug": "MeditrackMobileApp",
-    "version": "1.0.0",
+    "version": "3.2.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -12,9 +12,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ismoapps2023.MeditrackMobileApp",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to scan QR codes linked to inventory management.| Cette application utilise la caméra pour scanner les QR codes liés à la gestion des inventaires."
+      }
     },
     "android": {
+      "package": "com.ismoapps2023.MeditrackMobileApp",
+      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -22,6 +28,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "55f765de-4401-4589-b166-ac650f0c7ee5"
+      }
     }
   }
 }

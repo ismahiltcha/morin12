@@ -1,0 +1,43 @@
+{
+  "build": {
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": true
+      }
+    },
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      },
+      "ios": {
+        "simulator": true
+      }
+    },
+    "preview3": {
+      "developmentClient": true
+    },
+    "production": {
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "ios": {
+        "distribution": "store" 
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "ismoapps2023@gmail.com",
+        "ascAppId": "6736612823",
+        "appleTeamId": "V5CRH7SFZD"
+      },
+      "android": {
+        "track": "internal"
+      }
+    }
+  }
+}
