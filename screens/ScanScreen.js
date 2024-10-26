@@ -1,59 +1,74 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
-import QRCodeScanner from 'react-native-qrcode-scanner';
-import { RNCamera } from 'react-native-camera';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import React, { useCallback, useRef, useState } from 'react';
+import { Button, Linking, Platform, StyleSheet, Text, View } from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
 export default function ScanScreen({ navigation }) {
-  const [hasPermission, setHasPermission] = useState(null);
+    const [permission, requestPermission] = useCameraPermissions(); // Manage camera permissions
+    const qrLock = useRef(false);
 
-  // Vérifier les permissions caméra sur iOS
-  useEffect(() => {
-    (async () => {
-      const status = await check(PERMISSIONS.IOS.CAMERA);
-      if (status === RESULTS.GRANTED) {
-        setHasPermission(true);
-      } else {
-        const newStatus = await request(PERMISSIONS.IOS.CAMERA);
-        setHasPermission(newStatus === RESULTS.GRANTED);
-      }
-    })();
-  }, []);
+    //navigate action screen
+    const navigateToActionSelectionScreen = useCallback(({ type, data }) => {
+        if (data && !qrLock.current) {
+            qrLock.current = true;
+            setTimeout(async () => {
+                qrLock.current = false;
+                navigation.navigate('ActionSelection', { qrData: data });
+            }, 500);
+        }
+    }, []);
 
-  const onSuccess = (e) => {
-    console.log(`QR code with data ${e.data} has been scanned!`);
-    // Navigation vers l'écran de sélection des actions avec les données du QR Code
-    navigation.navigate('ActionSelection', { qrData: e.data });
-  };
+    if (!permission) {
+        // Camera permissions are still loading.
+        return <View />;
+    }
 
-  if (hasPermission === null) {
-    return <Text>Demande de permission pour la caméra...</Text>;
-  }
-  if (hasPermission === false) {
-    return <Text>Accès à la caméra refusé</Text>;
-  }
+    if (!permission.granted) {
+        // Camera permissions are not granted yet.
+        return (
+            <View style={styles.container}>
+                <Text style={styles.message}>Please Grant camera permission | Demande de permission pour la caméra...</Text>
+                <Button onPress={requestPermission} title="Grant Permission" />
+            </View>
+        );
+    }
 
-  return (
-    <View style={styles.container}>
-      <QRCodeScanner
-        onRead={onSuccess}
-        flashMode={RNCamera.Constants.FlashMode.auto}
-        topContent={<Text style={styles.centerText}>Scan the QR code to continue</Text>}
-        bottomContent={<Text style={styles.centerText}>Position the QR code in the center of the camera</Text>}
-      />
-    </View>
-  );
+    return (
+        <View style={styles.container}>
+            <CameraView
+                style={StyleSheet.absoluteFillObject}
+                facing="back"
+                onBarcodeScanned={navigateToActionSelectionScreen}
+            />
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  centerText: {
-    fontSize: 18,
-    padding: 32,
-    color: '#777',
-    textAlign: 'center',
-  },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    message: {
+        textAlign: 'center',
+        paddingBottom: 10,
+    },
+    camera: {
+        flex: 1,
+    },
+    buttonContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        backgroundColor: 'transparent',
+        margin: 64,
+    },
+    button: {
+        flex: 1,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
+    },
+    text: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'white',
+    },
 });
